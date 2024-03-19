@@ -13,7 +13,7 @@ def check(var):
         var.canbuy = "dark green"
     return var.canbuy
 
-def lvlup(var)
+def lvlup(var):
     if var.lvl < 10 and var.canbuy == "dark green":
         var.lvl += 1
         score -= var.price
@@ -52,9 +52,10 @@ class shopitem:
         self.maxlvl = False
         self.pricelist = []
 
-click.pricelist = [50, 60, 75, 100, 150, 200, 300, 500, 1000, 3000]
+click.pricelist = [50, 60, 75, 100, 150, 200, 300, 500, 1000, 3000 5000]
 click = shopitem(clickpricelist[0], 0)
 
+autoclick.pricelist = [100, 200, 300, 500, 750, 1000, 2000, 3000, 4000, 5000, 10000]
 autoclick = shopitem(autoclickpricelist[0], 0)
 
 shopfont = pygame.font.SysFont("Times New roman", 40)
@@ -67,6 +68,11 @@ clicklvlup = pygame.Rect(1420, 330, 460, 100)
 def clicktextfunc():
     clicktext = shopfont.render(f"{click.lvl} : Clicks Level : {click.price}", True, "black")
     return clicktext
+
+clicklvlup = pygame.Rect(1420, 480, 460, 100)
+def autoclicktextfunc():
+    autoclicktext = shopfont.render(f"{autoclick.lvl} : Autoclick Level : {autoclick.price}", True, "black")
+    return autoclicktext
 
 running = True
 
@@ -122,8 +128,16 @@ while running:
     
     pygame.draw.rect(screen, click.canbuy, clicklvlup) 
 
+    check(autoclick)
+
+    pygame.draw.rect(screen, autoclick.canbuy, autoclicklvlup)
+
+    clicktextfunc()
+    autoclicktextfunc()
+    
     screen.blit(shopprint, (1545, 205))
     screen.blit(clicktext, (1500, 360))
+    screen.blit(autoclicktext, (1500, 515)
 
     if frogfloat >= 100:
         frogup = False
@@ -162,5 +176,10 @@ while running:
 
             if clicklvlup.collidepoint(ev.pos):
                 lvlup(click)
+                clicktextfunc()
+
+            if autoclicklvlup.collidepoint(ev.pos):
+                lvlup(autoclick)
+                autoclicktextfunc()
 
     pygame.display.update()
