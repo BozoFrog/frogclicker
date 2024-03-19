@@ -1,9 +1,10 @@
 import pygame
 from pygame.locals import *
-import colorama
 from sprites import *
 
 pygame.init()
+
+score = 0
 
 def check(var):
     if score < var.price or var.maxlvl == True:
@@ -19,7 +20,7 @@ def lvlup(var):
         score -= var.price
         var.price = var.pricelist[var.lvl]
         var.maxlvl = False
-    if var.lvl = 10:
+    if var.lvl == 10:
         var.maxlvl = True
     return var, var.lvl, var.price, var.pricelsit, var.maxlvl, score
 
@@ -41,8 +42,6 @@ scorefontsize = 80
 
 scorefont = pygame.font.SysFont("comicsansms", scorefontsize)
 
-score = 0
-
 scoreprint = scorefont.render(f"{score}", True, pygame.color.Color("#E3963E"))
 
 class shopitem:
@@ -52,11 +51,12 @@ class shopitem:
         self.maxlvl = False
         self.pricelist = []
 
-click.pricelist = [50, 60, 75, 100, 150, 200, 300, 500, 1000, 3000 5000]
-click = shopitem(clickpricelist[0], 0)
+click = shopitem(50, 0)
+autoclick = shopitem(100, 0)
+
+click.pricelist = [50, 60, 75, 100, 150, 200, 300, 500, 1000, 3000, 5000]
 
 autoclick.pricelist = [100, 200, 300, 500, 750, 1000, 2000, 3000, 4000, 5000, 10000]
-autoclick = shopitem(autoclickpricelist[0], 0)
 
 shopfont = pygame.font.SysFont("Times New roman", 40)
 shopprint = shopfont.render("|Froggy Shop|", True, "black")
@@ -66,13 +66,17 @@ shopsign = pygame.Rect(1420, 180, 460, 100)
 
 clicklvlup = pygame.Rect(1420, 330, 460, 100)
 def clicktextfunc():
-    clicktext = shopfont.render(f"{click.lvl} : Clicks Level : {click.price}", True, "black")
+    clicktext = shopfont.rendgithuber(f"{click.lvl} : Clicks Level : {click.price}", True, "black")
     return clicktext
 
-clicklvlup = pygame.Rect(1420, 480, 460, 100)
+autoclicklvlup = pygame.Rect(1420, 480, 460, 100)
 def autoclicktextfunc():
     autoclicktext = shopfont.render(f"{autoclick.lvl} : Autoclick Level : {autoclick.price}", True, "black")
     return autoclicktext
+
+
+clicktext = shopfont.render(f"{click.lvl} : Clicks Level : {click.price}", True, "black")
+autoclicktext = shopfont.render(f"{autoclick.lvl} : Autoclick Level : {autoclick.price}", True, "black")
 
 running = True
 
@@ -137,7 +141,7 @@ while running:
     
     screen.blit(shopprint, (1545, 205))
     screen.blit(clicktext, (1500, 360))
-    screen.blit(autoclicktext, (1500, 515)
+    screen.blit(autoclicktext, (1500, 515))
 
     if frogfloat >= 100:
         frogup = False
@@ -155,6 +159,8 @@ while running:
 
     frog = pygame.Rect(208, 120 + frogfloat, 855, 720)
 
+    pygame.time.set_timer(score += autoclick.lvl, 1000)
+
     for ev in pygame.event.get():
         if ev.type == KEYDOWN:
             if ev.key == K_ESCAPE:
@@ -171,15 +177,27 @@ while running:
                 pygame.display.iconify()
 
             if frog.collidepoint(ev.pos):
-                score += click.lvl + 1
+                score += click.lvl + 10
                 scoreprint = scorefont.render(f"{score}", True, pygame.color.Color("#E3963E"))
 
             if clicklvlup.collidepoint(ev.pos):
-                lvlup(click)
-                clicktextfunc()
+                if click.lvl < 10 and click.canbuy == "dark green":
+                    click.lvl += 1
+                    score -= click.price
+                    click.price = click.pricelist[click.lvl]
+                    click.maxlvl = False
+                if click.lvl == 10:
+                    click.maxlvl = True
+                clicktext = (shopfont.render(f"{click.lvl} : Clicks Level : {click.price}", True, "black"))
 
             if autoclicklvlup.collidepoint(ev.pos):
-                lvlup(autoclick)
-                autoclicktextfunc()
+                if autoclick.lvl < 10 and autoclick.canbuy == "dark green":
+                    autoclick.lvl += 1
+                    score -= autoclick.price
+                    autoclick.price = autoclick.pricelist[autoclick.lvl]
+                    autoclick.maxlvl = False
+                if autoclick.lvl == 10:
+                    autoclick.maxlvl = True
+                autoclicktext = (shopfont.render(f"{autoclick.lvl} : Autoclick Level : {autoclick.price}", True, "black"))
 
     pygame.display.update()
