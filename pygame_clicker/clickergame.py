@@ -6,11 +6,22 @@ from sprites import *
 pygame.init()
 
 def check(var):
-    if score < self.price:
-    self.canbuy = "dark red"
+    if score < var.price or var.maxlvl == True:
+        var.canbuy = "dark red"
 
-else:
-    self.canbuy = "dark green"
+    else:
+        var.canbuy = "dark green"
+    return var.canbuy
+
+def lvlup(var)
+    if var.lvl < 10 and var.canbuy == "dark green":
+        var.lvl += 1
+        score -= var.price
+        var.price = var.pricelist[var.lvl]
+        var.maxlvl = False
+    if var.lvl = 10:
+        var.maxlvl = True
+    return var, var.lvl, var.price, var.pricelsit, var.maxlvl, score
 
 clock = pygame.time.Clock()
 
@@ -38,10 +49,13 @@ class shopitem:
     def __init__(self, price, lvl):
         self.price = price
         self.lvl = lvl
+        self.maxlvl = False
+        self.pricelist = []
 
-click = shopitem(50, 1)
+click.pricelist = [50, 60, 75, 100, 150, 200, 300, 500, 1000, 3000]
+click = shopitem(clickpricelist[0], 0)
 
-autoclick = shopitem(100, 0)
+autoclick = shopitem(autoclickpricelist[0], 0)
 
 shopfont = pygame.font.SysFont("Times New roman", 40)
 shopprint = shopfont.render("|Froggy Shop|", True, "black")
@@ -50,7 +64,9 @@ shopbg = pygame.Rect(1400, 160, 500, 800)
 shopsign = pygame.Rect(1420, 180, 460, 100)
 
 clicklvlup = pygame.Rect(1420, 330, 460, 100)
-clicktext = shopfont.render(f"{click.lvl} : Clicks Level : {click.price}", True, "black")
+def clicktextfunc():
+    clicktext = shopfont.render(f"{click.lvl} : Clicks Level : {click.price}", True, "black")
+    return clicktext
 
 running = True
 
@@ -102,6 +118,8 @@ while running:
     pygame.draw.rect(screen, pygame.color.Color("#E3963E"), shopbg)
     pygame.draw.rect(screen, pygame.color.Color("#D8B589"), shopsign)
 
+    check(click)
+    
     pygame.draw.rect(screen, click.canbuy, clicklvlup) 
 
     screen.blit(shopprint, (1545, 205))
@@ -139,7 +157,10 @@ while running:
                 pygame.display.iconify()
 
             if frog.collidepoint(ev.pos):
-                score += click.lvl
+                score += click.lvl + 1
                 scoreprint = scorefont.render(f"{score}", True, pygame.color.Color("#E3963E"))
+
+            if clicklvlup.collidepoint(ev.pos):
+                lvlup(click)
 
     pygame.display.update()
