@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from sprites import *
+import random
 
 pygame.init()
 
@@ -34,8 +35,6 @@ scr_flags = pygame.FULLSCREEN | pygame.NOFRAME
 
 screen = pygame.display.set_mode(scrs, scr_flags)
 
-scr_col = pygame.color.Color("grey")
-
 frogfloat = 100
 
 scorefontsize = 80
@@ -54,9 +53,9 @@ class shopitem:
 click = shopitem(50, 0)
 autoclick = shopitem(100, 0)
 
-click.pricelist = [50, 60, 75, 100, 150, 200, 300, 500, 1000, 3000, 5000]
+click.pricelist = [50, 60, 75, 100, 150, 200, 300, 500, 1000, 2000, 3000]
 
-autoclick.pricelist = [100, 200, 300, 500, 750, 1000, 2000, 3000, 4000, 5000, 10000]
+autoclick.pricelist = [100, 200, 300, 500, 750, 1000, 1250, 1500, 2000, 3000, 5000]
 
 shopfont = pygame.font.SysFont("Times New roman", 40)
 shopprint = shopfont.render("|Froggy Shop|", True, "black")
@@ -66,7 +65,7 @@ shopsign = pygame.Rect(1420, 180, 460, 100)
 
 clicklvlup = pygame.Rect(1420, 330, 460, 100)
 def clicktextfunc():
-    clicktext = shopfont.rendgithuber(f"{click.lvl} : Clicks Level : {click.price}", True, "black")
+    clicktext = shopfont.render(f"{click.lvl} : Clicks Level : {click.price}", True, "black")
     return clicktext
 
 autoclicklvlup = pygame.Rect(1420, 480, 460, 100)
@@ -78,12 +77,22 @@ def autoclicktextfunc():
 clicktext = shopfont.render(f"{click.lvl} : Clicks Level : {click.price}", True, "black")
 autoclicktext = shopfont.render(f"{autoclick.lvl} : Autoclick Level : {autoclick.price}", True, "black")
 
+autoclicker = USEREVENT+1
+
+pygame.time.set_timer(autoclicker, 1000)
+
+genfroglet = USEREVENT+2
+
+pygame.time.set_timer(genfroglet, 60000)
+
 running = True
+
+dev = True
 
 while running:
     clock.tick(60)
 
-    screen.fill(scr_col)
+    screen.blit(background, (0, 0))
 
     screen.blit(exspr, (1895, 10))
 
@@ -140,8 +149,8 @@ while running:
     autoclicktextfunc()
     
     screen.blit(shopprint, (1545, 205))
-    screen.blit(clicktext, (1500, 360))
-    screen.blit(autoclicktext, (1500, 515))
+    screen.blit(clicktext, (1450, 360))
+    screen.blit(autoclicktext, (1430, 515))
 
     if frogfloat >= 100:
         frogup = False
@@ -159,9 +168,29 @@ while running:
 
     frog = pygame.Rect(208, 120 + frogfloat, 855, 720)
 
-    pygame.time.set_timer(score += autoclick.lvl, 1000)
-
     for ev in pygame.event.get():
+
+        if ev.type == genfroglet:
+
+            frogletchance = random.randint(1, 80)
+            frogletxpos = random.randint(300, 1200)
+            frogletypos = random.randint(200, 700)
+
+            if 70 < frogletchance < 80:
+                screen.blit(frogletspr, (frogletxpos, frogletypos))
+                froglet = pygame.Rect(frogletxpos, frogletypos, 140, 90)
+
+            elif frogletchance == 80:
+                screen.blit(shinyfrogletspr, (frogletxpos, frogletypos))
+                shinyfroglet = pygame.Rect(frogletxpos, frogletypos, 140, 90)
+                
+            else:
+                pass
+
+        if ev.type == autoclicker:
+            score += autoclick.lvl
+            scoreprint = scorefont.render(f"{score}", True, pygame.color.Color("#E3963E"))
+
         if ev.type == KEYDOWN:
             if ev.key == K_ESCAPE:
                 running = False
@@ -181,23 +210,47 @@ while running:
                 scoreprint = scorefont.render(f"{score}", True, pygame.color.Color("#E3963E"))
 
             if clicklvlup.collidepoint(ev.pos):
-                if click.lvl < 10 and click.canbuy == "dark green":
+                if click.lvl < 11 and click.canbuy == "dark green":
                     click.lvl += 1
                     score -= click.price
                     click.price = click.pricelist[click.lvl]
                     click.maxlvl = False
-                if click.lvl == 10:
+                if click.lvl == 11:
                     click.maxlvl = True
-                clicktext = (shopfont.render(f"{click.lvl} : Clicks Level : {click.price}", True, "black"))
+
+                if click.maxlvl == False:
+                    clicktext = (shopfont.render(f"{click.lvl} : Clicks Level : {click.price}", True, "black"))
+                    scoreprint = scorefont.render(f"{score}", True, pygame.color.Color("#E3963E"))
+
+                else:
+                    clicktext = (shopfont.render(f"{click.lvl} : Max Level : :)", True, "black"))
+                    scoreprint = scorefont.render(f"{score}", True, pygame.color.Color("#E3963E"))
+
 
             if autoclicklvlup.collidepoint(ev.pos):
-                if autoclick.lvl < 10 and autoclick.canbuy == "dark green":
+                if autoclick.lvl < 11 and autoclick.canbuy == "dark green":
                     autoclick.lvl += 1
                     score -= autoclick.price
                     autoclick.price = autoclick.pricelist[autoclick.lvl]
                     autoclick.maxlvl = False
-                if autoclick.lvl == 10:
+                if autoclick.lvl == 11:
                     autoclick.maxlvl = True
-                autoclicktext = (shopfont.render(f"{autoclick.lvl} : Autoclick Level : {autoclick.price}", True, "black"))
+
+                if click.maxlvl == False:
+                    autoclicktext = (shopfont.render(f"{autoclick.lvl} : Autoclick Level : {autoclick.price}", True, "black"))
+                    scoreprint = scorefont.render(f"{score}", True, pygame.color.Color("#E3963E"))
+
+                else:
+                    autoclicktext = (shopfont.render(f"{autoclick.lvl} : Max Level : :)", True, "black"))
+                    scoreprint = scorefont.render(f"{score}", True, pygame.color.Color("#E3963E"))
+
+            
+            if click.maxlvl == autoclick.maxlvl == True:
+                winbutton = pygame.Rect(1555, 660, 223, 204)
+                screen.blit(winspr, (90, 100))
+                if winbutton.collidepoint(ev.pos):
+                    win = True
+                    running = False
+
 
     pygame.display.update()
